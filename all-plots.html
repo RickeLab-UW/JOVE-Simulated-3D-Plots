@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>JOVE Simulated 3D Plots (All)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://cdn.plot.ly">
+  <script src="https://cdn.plot.ly/plotly-gl3d-latest.min.js" defer></script>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:16px; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .hdr { text-align:center; margin: 10px 0 18px; }
+    .hdr h1 { font-size: 22px; margin: 0 0 6px; }
+    .hdr p { margin: 0; font-size: 14px; color:#444; }
+    .card { border: 1px solid #e5e5e5; border-radius: 14px; padding: 14px; margin: 14px 0; }
+    .card h2 { font-size: 18px; margin: 0 0 10px; }
+    .plot { width:100%; height:70vh; margin: 10px auto; border-radius: 12px; overflow:hidden; }
+    .skeleton { background: repeating-linear-gradient(90deg,#eee,#eee 10px,#f5f5f5 10px,#f5f5f5 20px); }
+    .small { font-size: 13px; color:#666; margin-top: 6px; }
+    nav a { margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hdr">
+      <h1>Interactive 3D Visualizations (Simulated)</h1>
+      <p>M.A. Peckenschneider, E.G. Olson, J.K. Byrnes, S.C. Ricke</p>
+    </div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="all-plots.html"><b>All Plots</b></a>
+      <a href="figOrganism1.html">Organism 1</a>
+      <a href="figOrganism2.html">Organism 2</a>
+      <a href="figpH.html">pH</a>
+    </nav>
+
+    <div class="card">
+      <h2>Simulated Organism 1</h2>
+      <div id="plot-org1" class="plot skeleton" aria-busy="true"></div>
+      <div class="small">Loads from: figOrganism1.json</div>
+    </div>
+
+    <div class="card">
+      <h2>Simulated Organism 2</h2>
+      <div id="plot-org2" class="plot skeleton" aria-busy="true"></div>
+      <div class="small">Loads from: figOrganism2.json</div>
+    </div>
+
+    <div class="card">
+      <h2>Simulated pH</h2>
+      <div id="plot-ph" class="plot skeleton" aria-busy="true"></div>
+      <div class="small">Loads from: figpH.json</div>
+    </div>
+  </div>
+
+  <script>
+    function waitForPlotly() {
+      return new Promise(res => {
+        if (window.Plotly) return res();
+        const iv = setInterval(() => {
+          if (window.Plotly) { clearInterval(iv); res(); }
+        }, 50);
+      });
+    }
+
+    async function loadPlot(elId, jsonFile) {
+      const el = document.getElementById(elId);
+      try {
+        await waitForPlotly();
+        const ver = Date.now(); // cache buster
+        const resp = await fetch(jsonFile + "?v=" + ver, { cache: "no-store" });
+        if (!resp.ok) throw new Error("Could not load " + jsonFile);
+        const fig = await resp.json();
+        await Plotly.newPlot(el, fig.data, fig.layout, { responsive: true });
+        el.classList.remove("skeleton");
+        el.setAttribute("aria-busy", "false");
+      } catch (err) {
+        console.error("Render error for", jsonFile, err);
+        el.classList.remove("skeleton");
+        el.innerHTML = "<p style='text-align:center'>Could not load the plot.</p>";
+        el.setAttribute("aria-busy", "false");
+      }
+    }
+
+    // Lazy-load each plot when it scrolls near view
+    function observeAndLoad(elId, jsonFile) {
+      const el = document.getElementById(elId);
+      const obs = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) {
+          loadPlot(elId, jsonFile);
+          obs.disconnect();
+        }
+      }, { rootMargin: "250px" });
+      obs.observe(el);
+    }
+
+    observeAndLoad("plot-org1", "figOrganism1.json");
+    observeAndLoad("plot-org2", "figOrganism2.json");
+    observeAndLoad("plot-ph",   "figpH.json");
+  </script>
+</body>
+</html>
