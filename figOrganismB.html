@@ -1,0 +1,53 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Simulated Organism 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://cdn.plot.ly">
+  <script src="https://cdn.plot.ly/plotly-gl3d-latest.min.js" defer></script>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:16px; }
+    #plot { width:100%; max-width:900px; height:70vh; margin:24px auto; }
+    .skeleton { background: repeating-linear-gradient(90deg,#eee,#eee 10px,#f5f5f5 10px,#f5f5f5 20px); }
+  </style>
+</head>
+<body>
+  <h1>Simulated Organism B</h1>
+  <div id="plot" class="skeleton" aria-busy="true"></div>
+
+  <script>
+    const el = document.getElementById("plot");
+    let started = false;
+
+    function waitForPlotly() {
+      return new Promise(res => {
+        if (window.Plotly) return res();
+        const iv = setInterval(() => { if (window.Plotly) { clearInterval(iv); res(); } }, 50);
+      });
+    }
+
+    async function render() {
+      if (started) return; started = true;
+      try {
+        await waitForPlotly();
+        const resp = await fetch("figOrganism2.json", { cache: "reload" });
+        if (!resp.ok) throw new Error("Could not load figOrganism2.json");
+        const fig = await resp.json();
+        await Plotly.newPlot(el, fig.data, fig.layout, { responsive: true });
+        el.classList.remove("skeleton");
+      } catch (err) {
+        console.error("Render error:", err);
+        el.classList.remove("skeleton");
+        el.innerHTML = "<p style=\"text-align:center\">Could not load the plot.</p>";
+      }
+    }
+
+    const obs = new IntersectionObserver((entries)=>{
+      if (entries.some(e => e.isIntersecting)) { render(); obs.disconnect(); }
+    }, { rootMargin: "200px" });
+    obs.observe(el);
+  </script>
+</body>
+</html>
