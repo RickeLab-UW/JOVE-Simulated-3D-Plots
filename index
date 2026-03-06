@@ -1,22 +1,20 @@
 <!doctype html>
-<a href="all-plots.html">All Plots (Organism 1 + Organism 2 + pH)</a>
 <html>
 <head>
   <meta charset="utf-8"/>
   <title>JOVE Simulated 3D Plots</title>
+
+  <!-- Auto-redirect to plots page -->
+  <meta http-equiv="refresh" content="0; url=all-plots.html" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:16px; }
-    .wrap { max-width:900px; margin:0 auto; }
-    a { display:block; padding:12px; border:1px solid #e5e5e5; border-radius:12px; margin:10px 0; text-decoration:none; }
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; text-align:center; padding-top:60px; }
+    a { font-size:18px; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Interactive 3D Visualizations</h1>
-    <a href="figOrganism1.html">Simulated Organism 1</a>
-    <a href="figOrganism2.html">Simulated Organism 2</a>
-    <a href="figpH.html">Simulated pH</a>
-  </div>
+  <p>Redirecting to interactive plots...</p>
+  <p>If you are not redirected, <a href="all-plots.html">click here</a>.</p>
 </body>
 </html>
